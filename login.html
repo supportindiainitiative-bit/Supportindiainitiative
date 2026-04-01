@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Secure Login | Support India Initiative</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* --- 1. CSS VARIABLES & THEME --- */
+        :root {
+            --primary: #0f172a;      /* Deep Slate Blue */
+            --primary-light: #1e293b;
+            --secondary: #FFFFFF;    /* Pure White */
+            --accent: #ea580c;       /* Strong NGO Orange */
+            --accent-hover: #c2410c; 
+            --bg-light: #F8FAFC;     
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --success: #10b981;      
+            --danger: #ef4444;       
+            
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.3);
+        }
+
+        /* --- 2. RESETS & ANDROID FIXES --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html, body { 
+            overflow-x: hidden !important; 
+            max-width: 100vw !important; 
+            width: 100%; height: 100%;
+            /* Deep, premium animated background for the login page */
+            background: linear-gradient(135deg, var(--primary), #1e3a8a, var(--primary));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark); 
+            display: flex; flex-direction: column;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* --- 3. LOGIN WRAPPER & GLASSMORPHISM --- */
+        .login-section {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            padding: 40px 20px; position: relative; z-index: 2;
+        }
+
+        /* Decorative background elements */
+        .circle-blob {
+            position: absolute; border-radius: 50%; filter: blur(60px); z-index: 1; opacity: 0.5;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: var(--accent); }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #3b82f6; }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            width: 100%; max-width: 450px; padding: 50px 40px; border-radius: 24px;
+            box-shadow: var(--shadow-glass); border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative; z-index: 10;
+        }
+
+        /* --- 4. LOGIN HEADER --- */
+        .login-header { text-align: center; margin-bottom: 35px; }
+        .login-logo { width: 75px; height: 75px; object-fit: contain; border-radius: 50%; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 3px solid white;}
+        .login-title { font-size: 1.8rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; line-height: 1.2;}
+        .login-subtitle { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; font-weight: 600;}
+
+        /* --- 5. FORMS & INPUTS --- */
+        .form-group { margin-bottom: 25px; text-align: left; position: relative;}
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
+        
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-icon { position: absolute; left: 15px; color: var(--text-light); font-size: 1.2rem; }
+        
+        .form-control { 
+            width: 100%; padding: 15px 15px 15px 45px; border: 2px solid #e2e8f0; 
+            border-radius: 12px; font-size: 1rem; background: var(--bg-light); 
+            transition: all 0.3s ease; color: var(--text-dark); font-weight: 600;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1); }
+        .form-control::placeholder { color: #94a3b8; font-weight: 400; }
+
+        /* Password Toggle Eye Icon */
+        .toggle-password { position: absolute; right: 15px; cursor: pointer; color: var(--text-light); padding: 5px; transition: 0.2s;}
+        .toggle-password:hover { color: var(--primary); }
+
+        /* Error Message */
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 12px;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center;
+            margin-bottom: 20px; border: 1px solid rgba(239, 68, 68, 0.3);
+            display: none; /* Hidden by default */
+        }
+
+        /* --- 6. BUTTONS --- */
+        .btn {
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+            padding: 16px 24px; font-size: 1.1rem; border-radius: 12px; font-weight: 800;
+            cursor: pointer; transition: all 0.3s ease; border: none; text-align: center; width: 100%;
+        }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3); }
+        .btn-primary:active { transform: scale(0.96); }
+        .btn-primary:hover { background: var(--primary-light); }
+        
+        .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: var(--text-light); margin-top: 15px; font-weight: 600;}
+        .btn-outline:hover { background: var(--bg-light); color: var(--text-dark); border-color: #cbd5e1;}
+
+        /* Loading Spinner inside button */
+        .btn-spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- 7. ANIMATIONS --- */
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        /* --- 8. FOOTER --- */
+        .login-footer {
+            text-align: center; padding: 20px; color: rgba(255,255,255,0.6); font-size: 0.85rem;
+            position: relative; z-index: 2;
+        }
+        .login-footer strong { color: var(--accent); }
+
+        /* --- 9. ANDROID FIXES --- */
+        @media(max-width: 480px) {
+            .login-card { padding: 40px 25px; border-radius: 20px; }
+            .login-title { font-size: 1.6rem; }
+            .form-control { font-size: 1rem; padding: 14px 14px 14px 40px; }
+            .input-icon { left: 12px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="circle-blob blob-1"></div>
+    <div class="circle-blob blob-2"></div>
+
+    <section class="login-section">
+        <div class="login-card" id="loginCard" data-aos="zoom-in" data-aos-duration="800">
+            
+            <div class="login-header">
+                <img src="logo.png" alt="Support India Logo" class="login-logo" onerror="this.style.display='none'">
+                <h1 class="login-title">Admin Portal</h1>
+                <p class="login-subtitle">Secure Access Required</p>
+            </div>
+
+            <div class="error-msg" id="errorMsg">
+                ⚠️ Invalid Email or Password. Access Denied.
+            </div>
+
+            <form id="adminForm" onsubmit="handleLogin(event)">
+                
+                <div class="form-group">
+                    <label class="form-label" for="emailInput">Official Email</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        </div>
+                        <input type="email" id="emailInput" class="form-control" placeholder="admin@supportindia.org" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="passInput">Security Key</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <input type="password" id="passInput" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
+                        
+                        <div class="toggle-password" onclick="togglePass()" title="Show/Hide Password">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 35px;">
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        <span id="btnText">Authenticate</span>
+                        <div class="btn-spinner" id="btnSpinner"></div>
+                    </button>
+                    
+                    <a href="index.html" class="btn btn-outline">
+                        ← Return to Website
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </section>
+
+    <footer class="login-footer">
+        <p>Support India Initiative &copy; 2026. All rights reserved.</p>
+        <p>Protected by <strong>Gamerbros ⚠️</strong> Security</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // 1. Initialize Animations
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ once: true, duration: 800, easing: 'ease-out-cubic' });
+            
+            // 2. Auto-Redirect if already logged in!
+            // If the admin already logged in earlier today, don't make them do it again.
+            if(sessionStorage.getItem('adminLogged') === 'true') {
+                window.location.replace('admin.html');
+            }
+        });
+
+        // 3. Password Visibility Toggle
+        function togglePass() {
+            const passInput = document.getElementById('passInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                // Change to Eye-Off SVG
+                eyeIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+            } else {
+                passInput.type = 'password';
+                // Change back to Eye SVG
+                eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            }
+        }
+
+        // 4. Secure Login Handler
+        function handleLogin(e) {
+            e.preventDefault(); // Stop page from refreshing
+
+            const email = document.getElementById('emailInput').value.trim();
+            const pass = document.getElementById('passInput').value.trim();
+            const errorBox = document.getElementById('errorMsg');
+            const loginCard = document.getElementById('loginCard');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Reset UI states
+            errorBox.style.display = 'none';
+            loginCard.classList.remove('shake');
+            
+            // Show Loading State on Button
+            loginBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'block';
+
+            // Simulate a slight network delay for premium feel (800ms)
+            setTimeout(() => {
+                
+                // --- HARDCODED CREDENTIALS CHECK ---
+                if (email === "supportindiainitiative@gmail.com" && pass === "maibabatillu04") {
+                    
+                    // SUCCESS: Grant access token in browser session
+                    sessionStorage.setItem('adminLogged', 'true');
+                    
+                    // Redirect to the Admin Control Panel
+                    window.location.replace('admin.html');
+
+                } else {
+                    
+                    // FAILED: Restore button and show error
+                    loginBtn.disabled = false;
+                    btnText.style.display = 'block';
+                    btnSpinner.style.display = 'none';
+                    
+                    errorBox.style.display = 'block';
+                    
+                    // Trigger physical shake animation on the card
+                    // Force reflow to allow the animation to trigger again if they fail twice
+                    void loginCard.offsetWidth; 
+                    loginCard.classList.add('shake');
+                    
+                    // Clear the password field for security
+                    document.getElementById('passInput').value = '';
+                }
+
+            }, 800);
+        }
+    </script>
+</body>
+</html>

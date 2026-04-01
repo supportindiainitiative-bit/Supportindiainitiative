@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Donation | Support India Initiative</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* --- 1. CSS VARIABLES & THEME --- */
+        :root {
+            --primary: #0f172a;      /* Deep Slate Blue */
+            --secondary: #FFFFFF;    /* Pure White */
+            --accent: #ea580c;       /* Strong NGO Orange */
+            --bg-light: #F8FAFC;     /* Very Light Gray/Blue for backgrounds */
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;      /* Verification Green */
+            --danger: #ef4444;       /* Alert Red */
+            
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px rgba(15, 23, 42, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+        }
+
+        /* --- 2. RESETS & ANDROID FIXES --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html, body { 
+            overflow-x: hidden !important; max-width: 100vw !important; 
+            width: 100%; min-height: 100vh;
+            background-color: var(--bg-light); color: var(--text-dark); 
+            line-height: 1.6; position: relative; scroll-behavior: smooth;
+            display: flex; flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; width: 100%; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        
+        /* --- 3. ANIMATIONS --- */
+        @keyframes indianFlagGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .flag-animated-bg {
+            background: linear-gradient(-45deg, rgba(255, 153, 51, 0.15), rgba(255, 255, 255, 0.95), rgba(19, 136, 8, 0.15));
+            background-size: 400% 400%;
+            animation: indianFlagGradient 15s ease infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-success { animation: pulse 2s infinite; }
+
+        /* --- 4. BUTTONS --- */
+        .btn {
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+            padding: 16px 28px; font-size: 1.1rem; border-radius: 12px; font-weight: 800;
+            cursor: pointer; transition: all 0.3s ease; border: none; text-align: center; width: 100%;
+        }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.2); }
+        .btn-primary:active { transform: scale(0.96); } 
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+        .btn-success:active { transform: scale(0.96); } 
+        .btn-outline { background: white; border: 2px solid var(--text-light); color: var(--text-light); }
+        .btn-outline:active { background: var(--bg-light); }
+        
+        /* Spinner inside button */
+        .btn-spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- 5. MODALS (T&C and Gamerbros) --- */
+        .legal-modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.85); z-index: 9999; 
+            display: none; align-items: center; justify-content: center; 
+            backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease;
+        }
+        .legal-modal.show { display: flex; opacity: 1; }
+        .legal-content { 
+            background: white; width: 90%; max-width: 550px; max-height: 85vh; 
+            overflow-y: auto; padding: 40px 30px; border-radius: 20px; 
+            position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .legal-modal.show .legal-content { transform: translateY(0); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #94a3b8; line-height: 1; }
+
+        /* --- 6. HEADER & NAVIGATION --- */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); 
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8); box-shadow: var(--shadow-glass);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; max-width: 1200px; margin: 0 auto; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { width: 50px; height: 50px; object-fit: contain; border-radius: 50%; box-shadow: var(--shadow-sm); }
+        .logo-text h1 { font-size: 1.3rem; color: var(--primary); font-weight: 800; line-height: 1.1;}
+        .logo-text p { font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase;}
+        
+        .nav-links a { font-weight: 600; color: var(--text-dark); transition: color 0.3s; display: flex; align-items: center; gap: 5px;}
+        .nav-links a:hover { color: var(--accent); }
+
+        /* --- 7. MULTI-STEP ENGINE --- */
+        .step-section { display: none; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; transform: translateY(20px); padding: 40px 0;}
+        .step-section.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        .form-box { background: white; padding: 40px; border-radius: 20px; box-shadow: var(--shadow-md); border-top: 6px solid var(--accent); width: 100%; max-width: 650px; margin: 0 auto; position: relative; z-index: 2;}
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-title { font-size: 1.8rem; color: var(--primary); font-weight: 800; margin-bottom: 10px;}
+        .form-subtitle { color: var(--text-light); font-size: 0.95rem; }
+
+        .security-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 6px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 15px;}
+
+        /* --- 8. FORMS & INPUTS --- */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; text-align: left;}
+        .form-label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-dark); font-size: 0.9rem; }
+        
+        .form-control { 
+            width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 12px; 
+            font-size: 1rem; background: var(--bg-light); transition: all 0.3s; color: var(--text-dark); font-weight: 500;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1); }
+        .form-control::placeholder { color: #94a3b8; }
+        
+        .input-hint { font-size: 0.8rem; color: var(--text-light); margin-top: 5px; display: block; }
+        .input-with-icon { position: relative; display: flex; align-items: center; }
+        .currency-symbol { position: absolute; left: 15px; font-size: 1.2rem; font-weight: 800; color: var(--text-dark); }
+        .amount-input { padding-left: 35px; font-weight: 800; color: var(--success); font-size: 1.1rem;}
+
+        /* --- 9. QR CODE & PAYMENT STYLES --- */
+        .payment-box { text-align: center; }
+        .amount-display { background: #f8fafc; padding: 20px; border-radius: 16px; border: 2px dashed #cbd5e1; margin-bottom: 25px; }
+        .amount-display h1 { color: var(--primary); font-size: 3rem; font-weight: 900; line-height: 1; margin: 5px 0;}
+        .amount-display p { color: var(--text-light); font-weight: 600; font-size: 0.9rem; text-transform: uppercase;}
+        
+        .pro-qr-box { position: relative; display: inline-block; padding: 20px; background: white; border-radius: 20px; margin-bottom: 25px; box-shadow: var(--shadow-md); border: 1px solid #e2e8f0;}
+        .pro-qr-box img { width: 220px; height: 220px; object-fit: contain; border-radius: 12px; }
+        
+        .upi-box { background: rgba(15, 23, 42, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 25px; }
+        .upi-id { font-size: 1.4rem; font-weight: 900; color: var(--primary); letter-spacing: 1px; }
+
+        /* --- 10. SUCCESS SECTION --- */
+        .success-box { text-align: center; padding: 40px 20px; }
+        .success-icon { font-size: 5rem; margin-bottom: 20px; display: inline-block; }
+        .success-steps { text-align: left; background: #f8fafc; padding: 25px; border-radius: 16px; border-left: 4px solid var(--accent); margin: 30px 0;}
+        .success-steps p { margin-bottom: 10px; font-weight: 600; color: var(--text-dark); font-size: 0.95rem;}
+
+        /* --- 11. FOOTER --- */
+        .main-footer { background: #0f172a; color: white; padding: 40px 20px; text-align: center; margin-top: auto; }
+
+        /* --- 12. ANDROID MEDIA QUERIES --- */
+        @media(max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .form-box { padding: 30px 20px; border-radius: 16px; }
+            .form-title { font-size: 1.5rem; }
+            .pro-qr-box img { width: 180px; height: 180px; }
+            .amount-display h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body class="flag-animated-bg">
+
+    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.85); z-index: -1;"></div>
+
+    <div class="legal-modal" id="tcModal">
+        <div class="legal-content">
+            <span class="close-modal" onclick="closeModal('tcModal')">&times;</span>
+            <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem;">Terms & Privacy Policy</h2>
+            <div style="font-size: 0.95rem; color: var(--text-dark); line-height: 1.7; text-align: left;">
+                <p><strong>1. Data Security:</strong> Your information is encrypted. We do not sell or share your data. It is strictly used to generate your Appreciation Certificate.</p>
+                <p style="margin-top: 10px;"><strong>2. 100% Verification:</strong> All donations are manually cross-checked with the provided UPI ID against our official bank statements.</p>
+                <p style="margin-top: 10px;"><strong>3. Refund Policy:</strong> Because funds are immediately allocated to active social campaigns, all donations are strictly <strong>non-refundable</strong>.</p>
+            </div>
+            <button class="btn btn-primary btn-full" style="margin-top: 25px;" onclick="closeModal('tcModal')">I Understand</button>
+        </div>
+    </div>
+
+    <div class="legal-modal" id="gamerbrosModal">
+        <div class="legal-content" style="border-top: 6px solid var(--danger);">
+            <span class="close-modal" onclick="closeModal('gamerbrosModal')">&times;</span>
+            <h2 style="color: var(--danger); margin-bottom: 20px; font-size: 1.5rem;">⚠️ Developer Disclaimer</h2>
+            <div style="font-size: 0.95rem; color: var(--text-dark); line-height: 1.7; text-align: left;">
+                <p><strong>Gamerbros</strong> is purely the software engineering team behind this website's infrastructure.</p>
+                <p style="margin-top: 10px;">We do <strong>NOT</strong> handle, collect, or manage any monetary donations. We are completely independent of the actual social work.</p>
+                <p style="margin-top: 10px;">All funds route directly to the NGO organizers. For disputes, contact the NGO directly via the Support Desk.</p>
+            </div>
+            <button class="btn btn-full" style="margin-top: 25px; background: var(--danger); color: white;" onclick="closeModal('gamerbrosModal')">I Acknowledge</button>
+        </div>
+    </div>
+
+    <header class="glass-nav">
+        <div class="nav-container">
+            <div class="logo-area">
+                <img src="logo.png" alt="Support India Logo" class="nav-logo" onerror="this.style.display='none'">
+                <div class="logo-text">
+                    <h1>Support India</h1>
+                    <p>Secure Portal</p>
+                </div>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">
+                    <span style="font-size: 1.2rem;">←</span> Return to Home
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <section id="step1" class="step-section active" data-aos="zoom-in" data-aos-duration="600">
+            <div class="form-box">
+                <div class="form-header">
+                    <div class="security-badge" onclick="openModal('tcModal')" style="cursor: pointer;">
+                        <span class="icon">🔒</span> 100% Secure & Verified
+                    </div>
+                    <h2 class="form-title">Donor Registration</h2>
+                    <p class="form-subtitle">Fill in your details. Certificates are generated after manual UPI verification to ensure authenticity.</p>
+                </div>
+
+                <form id="donationForm" onsubmit="goToStep2(event)">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="donorName">Official Full Name</label>
+                        <input type="text" id="donorName" class="form-control" placeholder="Enter name for Certificate" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="donorState">State</label>
+                            <input type="text" id="donorState" class="form-control" placeholder="e.g. Uttar Pradesh" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="donorPhone">WhatsApp Number</label>
+                            <input type="tel" id="donorPhone" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" required title="Please enter exactly 10 digits">
+                            <span class="input-hint">Your certificate will be sent here.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="donorUpi">Your UPI ID (Crucial for Verification)</label>
+                        <input type="text" id="donorUpi" class="form-control" placeholder="e.g. 9876543210@ybl or name@okhdfcbank" required>
+                        <span class="input-hint" style="color: var(--danger); font-weight: 600;">⚠️ We use this to match your payment in our bank.</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="donorAmount">Donation Amount</label>
+                            <div class="input-with-icon">
+                                <span class="currency-symbol">₹</span>
+                                <input type="number" id="donorAmount" class="form-control amount-input" placeholder="Amount" required min="1">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="campaignSelect">Select Campaign</label>
+                            <select id="campaignSelect" class="form-control">
+                                <option value="general">General NGO Fund</option>
+                                <option value="house">🏠 Ghar Banana</option>
+                                <option value="food">🍲 Khana / Ration</option>
+                                <option value="edu">🎓 Education Support</option>
+                                <option value="med">🏥 Medical Help</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" style="margin-top: 10px;">
+                        Proceed to Secure Payment ➔
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="step2" class="step-section">
+            <div class="form-box payment-box">
+                
+                <div style="background: rgba(15, 23, 42, 0.05); padding: 5px 15px; border-radius: 50px; display: inline-block; margin-bottom: 20px; font-weight: 700; font-size: 0.9rem; color: var(--primary);">
+                    Step 2 of 2: Make Payment
+                </div>
+
+                <div class="amount-display">
+                    <p>You are donating</p>
+                    <h1>₹<span id="displayAmount">0</span></h1>
+                    <p>To: <strong id="displayCause" style="color: var(--primary);">General Fund</strong></p>
+                </div>
+
+                <div class="pro-qr-box">
+                    <img src="qrcode.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg';" alt="Official QR Code">
+                </div>
+
+                <div class="upi-box">
+                    <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px; font-weight: 600;">Or pay directly to Official UPI ID:</p>
+                    <p class="upi-id">9793313562@ybl</p>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: left;">
+                    <p style="font-size: 0.85rem; color: var(--danger); font-weight: 700; margin: 0;">
+                        ⚠️ ACTION REQUIRED: Open your UPI app (GPay, PhonePe, Paytm), scan the code above, and complete the payment of ₹<span id="warningAmount">0</span>. Click the green button ONLY AFTER successful payment.
+                    </p>
+                </div>
+                
+                <button class="btn btn-success btn-full pulse-success" id="confirmPaymentBtn" onclick="finalizeDonation()">
+                    <span id="btnText">✅ I Have Paid Successfully</span>
+                    <div class="btn-spinner" id="btnSpinner"></div>
+                </button>
+                
+                <button class="btn btn-outline btn-full" style="margin-top: 15px;" onclick="goBackToStep1()">
+                    ← Edit Details
+                </button>
+
+            </div>
+        </section>
+
+        <section id="step3" class="step-section">
+            <div class="form-box success-box">
+                
+                <div class="success-icon">✅</div>
+                <h1 style="color: var(--primary); font-size: 2.2rem; font-weight: 900; margin-bottom: 10px;">Request Sent!</h1>
+                <p style="color: var(--text-light); font-size: 1.05rem;">Thank you, <strong id="successName">Donor</strong>. Your details have been transmitted securely to our Admin Team.</p>
+
+                <div class="success-steps">
+                    <h3 style="color: var(--accent); font-size: 1.1rem; margin-bottom: 15px; font-weight: 800;">What happens next?</h3>
+                    <p>1️⃣ Our team will manually verify the transaction using your provided UPI ID.</p>
+                    <p>2️⃣ Once verified, your name will appear permanently on the Live Leaderboard.</p>
+                    <p>3️⃣ Your Official Appreciation Certificate will be sent directly to your WhatsApp.</p>
+                </div>
+
+                <a href="index.html" class="btn btn-primary btn-full">Return to Homepage</a>
+
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="main-footer">
+        <p style="font-size: 0.9rem; color: #94a3b8;">&copy; 2026 Support India Initiative.</p>
+        <p style="font-size: 0.85rem; margin-top: 5px; color: #64748b;">
+            Protected by <span onclick="openModal('gamerbrosModal')" style="color: var(--accent); font-weight: bold; cursor: pointer;">Gamerbros ⚠️</span> Security
+        </p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // --- 1. INITIALIZATION & UI LOGIC ---
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ once: true, offset: 50, duration: 600, easing: 'ease-out-cubic' });
+            
+            // Auto-select dropdown if user came from a specific campaign button on index.html
+            const urlParams = new URLSearchParams(window.location.search);
+            const cause = urlParams.get('cause');
+            if(cause) {
+                const selectBox = document.getElementById('campaignSelect');
+                if(selectBox.querySelector(`option[value="${cause}"]`)) {
+                    selectBox.value = cause;
+                }
+            }
+        });
+
+        // Modal Toggles
+        function openModal(id) { 
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.style.display = 'flex'; 
+                setTimeout(() => modal.classList.add('show'), 10);
+            }
+        }
+        function closeModal(id) { 
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        }
+
+        // --- 2. CLOUD DATABASE CREDENTIALS ---
+        const API_KEY = "$2a$10$1h4KcR6wmUY0LhCi5BVo8OkNMKPPAd0XtzMrett0qXwS0ey5jMwlK";
+        const BIN_ID = "69c80437ed015c742bc59eed";
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+        // Temporary storage for form data
+        let donationData = null;
+
+        // --- 3. STEP 1 -> STEP 2 LOGIC ---
+        function goToStep2(e) {
+            e.preventDefault(); // Stop form from refreshing the page
+
+            // Capture Data
+            donationData = {
+                id: 'req_' + Date.now().toString(),
+                name: document.getElementById('donorName').value.trim(),
+                state: document.getElementById('donorState').value.trim(),
+                phone: document.getElementById('donorPhone').value.trim(),
+                upi: document.getElementById('donorUpi').value.trim(),
+                amount: parseInt(document.getElementById('donorAmount').value),
+                type: document.getElementById('campaignSelect').value,
+                timestamp: new Date().toLocaleString()
+            };
+
+            // Update Step 2 UI with the captured data
+            const amtStr = donationData.amount.toLocaleString('en-IN');
+            document.getElementById('displayAmount').innerText = amtStr;
+            document.getElementById('warningAmount').innerText = amtStr;
+            
+            const causeNames = {
+                'general': 'General NGO Fund',
+                'house': '🏠 Ghar Banana',
+                'food': '🍲 Khana / Ration',
+                'edu': '🎓 Education Support',
+                'med': '🏥 Medical Help'
+            };
+            document.getElementById('displayCause').innerText = causeNames[donationData.type] || 'General Fund';
+
+            // Transition UI: Hide Step 1, Show Step 2
+            switchSections('step1', 'step2');
+        }
+
+        // Go Back Logic
+        function goBackToStep1() {
+            switchSections('step2', 'step1');
+        }
+
+        // --- 4. STEP 2 -> STEP 3 (CLOUD SYNC LOGIC) ---
+        async function finalizeDonation() {
+            if(!donationData) {
+                alert("Data error. Please restart the form.");
+                goBackToStep1();
+                return;
+            }
+
+            // UI: Set Button to Loading State
+            const btn = document.getElementById('confirmPaymentBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            
+            btn.classList.remove('pulse-success');
+            btn.disabled = true;
+            btnText.innerText = "Syncing Securely...";
+            btnSpinner.style.display = "inline-block";
+
+            try {
+                // Step A: Fetch current cloud database so we don't overwrite other data
+                let getRes = await fetch(API_URL + '/latest', { 
+                    method: 'GET', headers: { 'X-Master-Key': API_KEY } 
+                });
+                
+                let getResult = await getRes.json();
+                let currentData = getResult.record;
+
+                // Step B: Append our new donation to the 'pending' queue
+                if(!currentData.pending) currentData.pending = [];
+                currentData.pending.push(donationData);
+
+                // Step C: Push updated data back to cloud
+                await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                    body: JSON.stringify(currentData)
+                });
+
+                // Step D: Transition to Success UI
+                document.getElementById('successName').innerText = donationData.name;
+                switchSections('step2', 'step3');
+
+            } catch (error) {
+                console.error("Cloud Error:", error);
+                alert("There was an issue connecting to the server. Please check your internet connection and try again.");
+                
+                // Reset Button UI on failure
+                btn.classList.add('pulse-success');
+                btn.disabled = false;
+                btnText.innerText = "✅ I Have Paid Successfully";
+                btnSpinner.style.display = "none";
+            }
+        }
+
+        // --- 5. UI TRANSITION HELPER ---
+        function switchSections(hideId, showId) {
+            const hideEl = document.getElementById(hideId);
+            const showEl = document.getElementById(showId);
+
+            // Fade out current section
+            hideEl.style.opacity = '0';
+            hideEl.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                hideEl.classList.remove('active');
+                
+                // Prepare new section
+                showEl.classList.add('active');
+                
+                // Small delay to allow display:block to apply before animating opacity
+                setTimeout(() => {
+                    showEl.style.opacity = '1';
+                    showEl.style.transform = 'translateY(0)';
+                    // Scroll to top of the form smoothly
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 50);
+            }, 500); // Wait for CSS transition to finish
+        }
+    </script>
+
+</body>
+</html>
